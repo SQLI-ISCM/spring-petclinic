@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,11 +50,11 @@ import org.springframework.transaction.annotation.Transactional;
  * <li><strong>Dependency Injection</strong> of test fixture instances, meaning that we
  * don't need to perform application context lookups. See the use of
  * {@link Autowired @Autowired} on the <code> </code> instance variable, which uses
- * autowiring <em>by type</em>.
+ * autowiring <em>by type</em>.</li>
  * <li><strong>Transaction management</strong>, meaning each test method is executed in
  * its own transaction, which is automatically rolled back by default. Thus, even if tests
  * insert or otherwise change database state, there is no need for a teardown or cleanup
- * script.
+ * script.</li>
  * <li>An {@link org.springframework.context.ApplicationContext ApplicationContext} is
  * also inherited and can be used for explicit bean lookup if necessary.</li>
  * </ul>
@@ -82,11 +82,12 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindOwnersByLastName() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
-		assertThat(owners).hasSize(2);
+		// Renamed local variable to avoid shadowing class field 'owners'
+		Page<Owner> ownersPage = this.owners.findByLastNameStartingWith("Davis", pageable);
+		assertThat(ownersPage).hasSize(2);
 
-		owners = this.owners.findByLastNameStartingWith("Daviss", pageable);
-		assertThat(owners).isEmpty();
+		ownersPage = this.owners.findByLastNameStartingWith("Daviss", pageable);
+		assertThat(ownersPage).isEmpty();
 	}
 
 	@Test
@@ -103,8 +104,9 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldInsertOwner() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
-		int found = (int) owners.getTotalElements();
+		// Renamed local variable to avoid shadowing class field 'owners'
+		Page<Owner> ownersPage = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		int found = (int) ownersPage.getTotalElements();
 
 		Owner owner = new Owner();
 		owner.setFirstName("Sam");
@@ -115,8 +117,8 @@ class ClinicServiceTests {
 		this.owners.save(owner);
 		assertThat(owner.getId()).isNotZero();
 
-		owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
-		assertThat(owners.getTotalElements()).isEqualTo(found + 1);
+		ownersPage = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		assertThat(ownersPage.getTotalElements()).isEqualTo(found + 1);
 	}
 
 	@Test
