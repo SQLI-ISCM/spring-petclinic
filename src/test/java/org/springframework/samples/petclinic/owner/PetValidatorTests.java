@@ -1,4 +1,3 @@
-```java
 /*
  * Copyright 2012-2024 the original author or authors.
  *
@@ -49,7 +48,7 @@ public class PetValidatorTests {
     // Renamed constants to comply with naming convention (uppercase with underscores)
     private static final String PET_NAME = "Buddy";
     private static final String PET_TYPE_NAME = "Dog";
-    private static final LocalDate petBirthDate = LocalDate.of(1990, 1, 1);
+    private static final LocalDate PET_BIRTH_DATE = LocalDate.of(1990, 1, 1);
 
     @BeforeEach
     void setUp() {
@@ -64,7 +63,7 @@ public class PetValidatorTests {
         petType.setName(PET_TYPE_NAME);
         pet.setName(PET_NAME);
         pet.setType(petType);
-        pet.setBirthDate(petBirthDate);
+        pet.setBirthDate(PET_BIRTH_DATE);
 
         petValidator.validate(pet, errors);
 
@@ -79,7 +78,7 @@ public class PetValidatorTests {
             petType.setName(PET_TYPE_NAME);
             pet.setName("");
             pet.setType(petType);
-            pet.setBirthDate(petBirthDate);
+            pet.setBirthDate(PET_BIRTH_DATE);
 
             petValidator.validate(pet, errors);
 
@@ -90,7 +89,7 @@ public class PetValidatorTests {
         void testValidateWithInvalidPetType() {
             pet.setName(PET_NAME);
             pet.setType(null);
-            pet.setBirthDate(petBirthDate);
+            pet.setBirthDate(PET_BIRTH_DATE);
 
             petValidator.validate(pet, errors);
 
@@ -112,4 +111,3 @@ public class PetValidatorTests {
     }
 
 }
-```
