@@ -1,3 +1,4 @@
+```java
 /*
  * Copyright 2012-2024 the original author or authors.
  *
@@ -48,11 +49,11 @@ public class PetValidatorTests {
 
 	private Errors errors;
 
-	private static final String petName = "Buddy";
+	private static final String PET_NAME = "Buddy"; // Renamed constant
 
-	private static final String petTypeName = "Dog";
+	private static final String PET_TYPE_NAME = "Dog"; // Renamed constant
 
-	private static final LocalDate petBirthDate = LocalDate.of(1990, 1, 1);
+	private static final LocalDate PET_BIRTH_DATE = LocalDate.of(1990, 1, 1); // Renamed constant
 
 	@BeforeEach
 	void setUp() {
@@ -64,10 +65,10 @@ public class PetValidatorTests {
 
 	@Test
 	void testValidate() {
-		petType.setName(petTypeName);
-		pet.setName(petName);
+		petType.setName(PET_TYPE_NAME);
+		pet.setName(PET_NAME);
 		pet.setType(petType);
-		pet.setBirthDate(petBirthDate);
+		pet.setBirthDate(PET_BIRTH_DATE);
 
 		petValidator.validate(pet, errors);
 
@@ -79,10 +80,10 @@ public class PetValidatorTests {
 
 		@Test
 		void testValidateWithInvalidPetName() {
-			petType.setName(petTypeName);
+			petType.setName(PET_TYPE_NAME);
 			pet.setName("");
 			pet.setType(petType);
-			pet.setBirthDate(petBirthDate);
+			pet.setBirthDate(PET_BIRTH_DATE);
 
 			petValidator.validate(pet, errors);
 
@@ -91,9 +92,9 @@ public class PetValidatorTests {
 
 		@Test
 		void testValidateWithInvalidPetType() {
-			pet.setName(petName);
+			pet.setName(PET_NAME);
 			pet.setType(null);
-			pet.setBirthDate(petBirthDate);
+			pet.setBirthDate(PET_BIRTH_DATE);
 
 			petValidator.validate(pet, errors);
 
@@ -102,8 +103,8 @@ public class PetValidatorTests {
 
 		@Test
 		void testValidateWithInvalidBirthDate() {
-			petType.setName(petTypeName);
-			pet.setName(petName);
+			petType.setName(PET_TYPE_NAME);
+			pet.setName(PET_NAME);
 			pet.setType(petType);
 			pet.setBirthDate(null);
 
@@ -115,3 +116,4 @@ public class PetValidatorTests {
 	}
 
 }
+```
