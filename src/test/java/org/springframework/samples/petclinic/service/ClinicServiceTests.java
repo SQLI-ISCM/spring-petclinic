@@ -82,11 +82,11 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindOwnersByLastName() {
-		Page<Owner> owners = this.ownerRepository.findByLastNameStartingWith("Davis", pageable);
-		assertThat(owners).hasSize(2);
+		Page<Owner> ownerPage = this.ownerRepository.findByLastNameStartingWith("Davis", pageable);
+		assertThat(ownerPage).hasSize(2);
 
-		owners = this.ownerRepository.findByLastNameStartingWith("Daviss", pageable);
-		assertThat(owners).isEmpty();
+		ownerPage = this.ownerRepository.findByLastNameStartingWith("Daviss", pageable);
+		assertThat(ownerPage).isEmpty();
 	}
 
 	@Test
@@ -103,8 +103,8 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldInsertOwner() {
-		Page<Owner> owners = this.ownerRepository.findByLastNameStartingWith("Schultz", pageable);
-		int found = (int) owners.getTotalElements();
+		Page<Owner> ownerPage = this.ownerRepository.findByLastNameStartingWith("Schultz", pageable);
+		int found = (int) ownerPage.getTotalElements();
 
 		Owner owner = new Owner();
 		owner.setFirstName("Sam");
@@ -115,8 +115,8 @@ class ClinicServiceTests {
 		this.ownerRepository.save(owner);
 		assertThat(owner.getId()).isNotZero();
 
-		owners = this.ownerRepository.findByLastNameStartingWith("Schultz", pageable);
-		assertThat(owners.getTotalElements()).isEqualTo(found + 1);
+		ownerPage = this.ownerRepository.findByLastNameStartingWith("Schultz", pageable);
+		assertThat(ownerPage.getTotalElements()).isEqualTo(found + 1);
 	}
 
 	@Test
