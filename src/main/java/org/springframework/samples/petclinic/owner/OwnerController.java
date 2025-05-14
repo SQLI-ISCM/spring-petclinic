@@ -52,6 +52,7 @@ class OwnerController {
 	private static final String MESSAGE_CREATION = "New Owner Created"; // Compliant
 	private static final String ERROR_UPDATE_MESSAGE = "There was an error in updating the owner."; // Compliant
 	private static final String ERROR_ID_MISMATCH_MESSAGE = "Owner ID mismatch. Please try again."; // Compliant
+	private static final String ACTION_ERROR = "error"; // Added constant for duplicated string
 
 	private final OwnerRepository owners;
 
@@ -80,7 +81,7 @@ class OwnerController {
 	@PostMapping("/owners/new")
 	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_CREATION_MESSAGE);
+			redirectAttributes.addFlashAttribute(ACTION_ERROR, ERROR_CREATION_MESSAGE); // Updated to use constant
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -144,13 +145,13 @@ class OwnerController {
 	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_UPDATE_MESSAGE);
+			redirectAttributes.addFlashAttribute(ACTION_ERROR, ERROR_UPDATE_MESSAGE); // Updated to use constant
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 		}
 
 		if (owner.getId() != ownerId) {
 			result.rejectValue("id", "mismatch", "The owner ID in the form does not match the URL.");
-			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_ID_MISMATCH_MESSAGE);
+			redirectAttributes.addFlashAttribute(ACTION_ERROR, ERROR_ID_MISMATCH_MESSAGE); // Updated to use constant
 			return "redirect:/owners/{ownerId}/edit";
 		}
 
