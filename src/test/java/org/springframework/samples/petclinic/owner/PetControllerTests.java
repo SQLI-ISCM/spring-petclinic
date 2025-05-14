@@ -62,6 +62,8 @@ class PetControllerTests {
 	private static final String PET_NAME_BETTY = "Betty"; // New constant for pet name
 	private static final String BIRTH_DATE = "2015-02-12"; // New constant for birth date
 	private static final String PET_NAME_PETTY = "petty"; // New constant for another pet name
+	private static final String PETS_NEW_PATH = "/owners/{ownerId}/pets/new"; // New constant for the new pet path
+	private static final String PETS_EDIT_PATH = "/owners/{ownerId}/pets/{petId}/edit"; // New constant for the edit pet path
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -90,7 +92,7 @@ class PetControllerTests {
 
 	@Test
 	void testInitCreationForm() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
+		mockMvc.perform(get(PETS_NEW_PATH, TEST_OWNER_ID))
 			.andExpect(status().isOk())
 			.andExpect(view().name(PETS_CREATE_OR_UPDATE_FORM))
 			.andExpect(model().attributeExists("pet"));
@@ -99,7 +101,7 @@ class PetControllerTests {
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", PET_NAME_BETTY)
+			.perform(post(PETS_NEW_PATH, TEST_OWNER_ID).param("name", PET_NAME_BETTY)
 				.param("type", PET_TYPE_HAMSTER)
 				.param("birthDate", BIRTH_DATE))
 			.andExpect(status().is3xxRedirection())
@@ -112,7 +114,7 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithBlankName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "\t \n")
+				.perform(post(PETS_NEW_PATH, TEST_OWNER_ID).param("name", "\t \n")
 					.param("birthDate", BIRTH_DATE))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -125,7 +127,7 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithDuplicateName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", PET_NAME_PETTY)
+				.perform(post(PETS_NEW_PATH, TEST_OWNER_ID).param("name", PET_NAME_PETTY)
 					.param("birthDate", BIRTH_DATE))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -138,7 +140,7 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithMissingPetType() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", PET_NAME_BETTY)
+				.perform(post(PETS_NEW_PATH, TEST_OWNER_ID).param("name", PET_NAME_BETTY)
 					.param("birthDate", BIRTH_DATE))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -154,7 +156,7 @@ class PetControllerTests {
 			String futureBirthDate = currentDate.plusMonths(1).toString();
 
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", PET_NAME_BETTY)
+				.perform(post(PETS_NEW_PATH, TEST_OWNER_ID).param("name", PET_NAME_BETTY)
 					.param("birthDate", futureBirthDate))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -166,7 +168,7 @@ class PetControllerTests {
 
 		@Test
 		void testInitUpdateForm() throws Exception {
-			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
+			mockMvc.perform(get(PETS_EDIT_PATH, TEST_OWNER_ID, TEST_PET_ID))
 				.andExpect(status().isOk())
 				.andExpect(model().attributeExists("pet"))
 				.andExpect(view().name(PETS_CREATE_OR_UPDATE_FORM));
@@ -177,7 +179,7 @@ class PetControllerTests {
 	@Test
 	void testProcessUpdateFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", PET_NAME_BETTY)
+			.perform(post(PETS_EDIT_PATH, TEST_OWNER_ID, TEST_PET_ID).param("name", PET_NAME_BETTY)
 				.param("type", PET_TYPE_HAMSTER)
 				.param("birthDate", BIRTH_DATE))
 			.andExpect(status().is3xxRedirection())
@@ -190,7 +192,7 @@ class PetControllerTests {
 		@Test
 		void testProcessUpdateFormWithInvalidBirthDate() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
+				.perform(post(PETS_EDIT_PATH, TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
 					.param("birthDate", "2015/02/12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -202,7 +204,7 @@ class PetControllerTests {
 		@Test
 		void testProcessUpdateFormWithBlankName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
+				.perform(post(PETS_EDIT_PATH, TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
 					.param("birthDate", BIRTH_DATE))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
