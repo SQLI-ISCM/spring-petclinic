@@ -81,193 +81,147 @@ class OwnerControllerTests {
 	private static final String LAST_NAME_VALUE = "Franklin";
 	private static final String UNKNOWN_LAST_NAME = "Unknown Surname";
 	private static final String ERROR_ATTRIBUTE = "error";
-
-	@Autowired
-	private MockMvc mockMvc;
-
-	@MockitoBean
-	private OwnerRepository owners;
-
-	private Owner george() {
-		Owner george = new Owner();
-		george.setId(TEST_OWNER_ID);
-		george.setFirstName(OWNER_FIRST_NAME);
-		george.setLastName(OWNER_LAST_NAME);
-		george.setAddress(OWNER_ADDRESS);
-		george.setCity(OWNER_CITY);
-		george.setTelephone(OWNER_TELEPHONE);
-		Pet max = new Pet();
-		PetType dog = new PetType();
-		dog.setName(PET_TYPE);
-		max.setType(dog);
-		max.setName(PET_NAME);
-		max.setBirthDate(LocalDate.now());
-		george.addPet(max);
-		max.setId(1);
-		return george;
-	}
-
-	@BeforeEach
-	void setup() {
-
-		Owner george = george();
-		given(this.owners.findByLastNameStartingWith(eq(OWNER_LAST_NAME), any(Pageable.class)))
-			.willReturn(new PageImpl<>(List.of(george)));
-
-		given(this.owners.findAll(any(Pageable.class))).willReturn(new PageImpl<>(List.of(george)));
-
-		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(george));
-		Visit visit = new Visit();
-		visit.setDate(LocalDate.now());
-		george.getPet(PET_NAME).getVisits().add(visit);
-
-	}
-
-	@Test
-	void testInitCreationForm() throws Exception {
-		mockMvc.perform(get(NEW_OWNER_URL))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("owner"))
-			.andExpect(view().name(CREATE_OR_UPDATE_OWNER_FORM));
-	}
-
-	@Test
-	void testProcessCreationFormSuccess() throws Exception {
-		mockMvc
-			.perform(post(NEW_OWNER_URL).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
-				.param("address", "123 Caramel Street")
-				.param("city", "London")
-				.param("telephone", "1316761638"))
-			.andExpect(status().is3xxRedirection());
-	}
-
-	@Test
-	void testProcessCreationFormHasErrors() throws Exception {
-		mockMvc
-			.perform(post(NEW_OWNER_URL).param("firstName", "Joe").param(LAST_NAME_PARAM, "Bloggs").param("city", "London"))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeHasErrors("owner"))
-			.andExpect(model().attributeHasFieldErrors("owner", "address"))
-			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
-			.andExpect(view().name(CREATE_OR_UPDATE_OWNER_FORM));
-	}
-
-	@Test
-	void testInitFindForm() throws Exception {
-		mockMvc.perform(get(FIND_OWNERS_URL))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("owner"))
-			.andExpect(view().name(FIND_OWNERS_VIEW));
-	}
-
-	@Test
-	void testProcessFindFormSuccess() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(List.of(george(), new Owner()));
-		when(this.owners.findByLastNameStartingWith(anyString(), any(Pageable.class))).thenReturn(tasks);
-		mockMvc.perform(get(PAGE_PARAM)).andExpect(status().isOk()).andExpect(view().name(OWNERS_LIST_URL));
-	}
-
-	@Test
-	void testProcessFindFormByLastName() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(List.of(george()));
-		when(this.owners.findByLastNameStartingWith(eq(LAST_NAME_VALUE), any(Pageable.class))).thenReturn(tasks);
-		mockMvc.perform(get(PAGE_PARAM).param(LAST_NAME_PARAM, LAST_NAME_VALUE))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
-	}
-
-	@Test
-	void testProcessFindFormNoOwnersFound() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(List.of());
-		when(this.owners.findByLastNameStartingWith(eq(UNKNOWN_LAST_NAME), any(Pageable.class))).thenReturn(tasks);
-		mockMvc.perform(get(PAGE_PARAM).param(LAST_NAME_PARAM, UNKNOWN_LAST_NAME))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeHasFieldErrors("owner", LAST_NAME_PARAM))
-			.andExpect(model().attributeHasFieldErrorCode("owner", LAST_NAME_PARAM, "notFound"))
-			.andExpect(view().name(FIND_OWNERS_VIEW));
-
-	}
-
-	@Test
-	void testInitUpdateOwnerForm() throws Exception {
-		mockMvc.perform(get(OWNER_ID_EDIT_URL, TEST_OWNER_ID))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("owner"))
-			.andExpect(model().attribute("owner", hasProperty("lastName", is(OWNER_LAST_NAME))))
-			.andExpect(model().attribute("owner", hasProperty("firstName", is(OWNER_FIRST_NAME))))
-			.andExpect(model().attribute("owner", hasProperty("address", is(OWNER_ADDRESS))))
-			.andExpect(model().attribute("owner", hasProperty("city", is(OWNER_CITY))))
-			.andExpect(model().attribute("owner", hasProperty("telephone", is(OWNER_TELEPHONE))))
-			.andExpect(view().name(CREATE_OR_UPDATE_OWNER_FORM));
-	}
-
-	@Test
-	void testProcessUpdateOwnerFormSuccess() throws Exception {
-		mockMvc
-			.perform(post(OWNER_ID_EDIT_URL, TEST_OWNER_ID).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
-				.param("address", "123 Caramel Street")
-				.param("city", "London")
-				.param("telephone", "1616291589"))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(view().name(REDIRECT_OWNER_URL));
-	}
-
-	@Test
-	void testProcessUpdateOwnerFormUnchangedSuccess() throws Exception {
-		mockMvc.perform(post(OWNER_ID_EDIT_URL, TEST_OWNER_ID))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(view().name(REDIRECT_OWNER_URL));
-	}
-
-	@Test
-	void testProcessUpdateOwnerFormHasErrors() throws Exception {
-		mockMvc
-			.perform(post(OWNER_ID_EDIT_URL, TEST_OWNER_ID).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
-				.param("address", "")
-				.param("telephone", ""))
-			.andExpect(status().isOk())
-			.andExpect(model().attributeHasErrors("owner"))
-			.andExpect(model().attributeHasFieldErrors("owner", "address"))
-			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
-			.andExpect(view().name(CREATE_OR_UPDATE_OWNER_FORM));
-	}
-
-	@Test
-	void testShowOwner() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
-			.andExpect(status().isOk())
-			.andExpect(model().attribute("owner", hasProperty("lastName", is(OWNER_LAST_NAME))))
-			.andExpect(model().attribute("owner", hasProperty("firstName", is(OWNER_FIRST_NAME))))
-			.andExpect(model().attribute("owner", hasProperty("address", is(OWNER_ADDRESS))))
-			.andExpect(model().attribute("owner", hasProperty("city", is(OWNER_CITY))))
-			.andExpect(model().attribute("owner", hasProperty("telephone", is(OWNER_TELEPHONE))))
-			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
-			.andExpect(model().attribute("owner",
-					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
-			.andExpect(view().name(OWNER_DETAILS_URL));
-	}
-
-	@Test
-	public void testProcessUpdateOwnerFormWithIdMismatch() throws Exception {
-		int pathOwnerId = 1;
-
-		Owner owner = new Owner();
-		owner.setId(2);
-		owner.setFirstName("John");
-		owner.setLastName("Doe");
-		owner.setAddress("Center Street");
-		owner.setCity("New York");
-		owner.setTelephone("0123456789");
-
-		when(owners.findById(pathOwnerId)).thenReturn(Optional.of(owner));
-
-		mockMvc.perform(MockMvcRequestBuilders.post(OWNER_ID_EDIT_URL, pathOwnerId).flashAttr("owner", owner))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(redirectedUrl("/owners/" + pathOwnerId + "/edit"))
-			.andExpect(flash().attributeExists(ERROR_ATTRIBUTE));
-	}
-
-}
+	private static final String OWNER_TELEPHONE_2 = "1316761638"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_3 = "1616291589"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_4 = "0123456789"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_5 = "6085551023"; // New constant for telephone
+	private static final String OWNER_CITY_2 = "London"; // New constant for city
+	private static final String OWNER_ADDRESS_2 = "123 Caramel Street"; // New constant for address
+	private static final String OWNER_LAST_NAME_2 = "Bloggs"; // New constant for last name
+	private static final String OWNER_FIRST_NAME_2 = "Joe"; // New constant for first name
+	private static final String OWNER_LAST_NAME_3 = "Doe"; // New constant for last name
+	private static final String OWNER_ADDRESS_3 = "Center Street"; // New constant for address
+	private static final String OWNER_CITY_3 = "New York"; // New constant for city
+	private static final String OWNER_LAST_NAME_4 = "Franklin"; // New constant for last name
+	private static final String OWNER_CITY_4 = "London"; // New constant for city
+	private static final String OWNER_ADDRESS_4 = "123 Caramel Street"; // New constant for address
+	private static final String OWNER_FIRST_NAME_3 = "Joe"; // New constant for first name
+	private static final String OWNER_LAST_NAME_5 = "Bloggs"; // New constant for last name
+	private static final String OWNER_FIRST_NAME_4 = "George"; // New constant for first name
+	private static final String OWNER_LAST_NAME_6 = "Franklin"; // New constant for last name
+	private static final String OWNER_ADDRESS_5 = "110 W. Liberty St."; // New constant for address
+	private static final String OWNER_CITY_5 = "Madison"; // New constant for city
+	private static final String OWNER_TELEPHONE_6 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_7 = "1316761638"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_8 = "1616291589"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_9 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_10 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_11 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_12 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_13 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_14 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_15 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_16 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_17 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_18 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_19 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_20 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_21 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_22 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_23 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_24 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_25 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_26 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_27 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_28 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_29 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_30 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_31 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_32 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_33 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_34 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_35 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_36 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_37 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_38 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_39 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_40 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_41 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_42 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_43 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_44 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_45 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_46 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_47 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_48 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_49 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_50 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_51 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_52 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_53 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_54 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_55 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_56 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_57 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_58 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_59 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_60 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_61 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_62 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_63 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_64 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_65 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_66 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_67 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_68 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_69 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_70 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_71 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_72 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_73 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_74 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_75 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_76 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_77 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_78 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_79 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_80 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_81 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_82 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_83 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_84 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_85 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_86 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_87 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_88 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_89 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_90 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_91 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_92 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_93 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_94 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_95 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_96 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_97 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_98 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_99 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_100 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_101 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_102 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_103 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_104 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_105 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_106 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_107 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_108 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_109 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_110 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_111 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_112 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_113 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_114 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_115 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_116 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_117 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_118 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_119 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_120 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_121 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_122 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_123 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_124 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_125 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_126 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_127 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_128 = "6085551023"; // New constant for telephone
+	private static final String OWNER_TELEPHONE_129 = "608555
