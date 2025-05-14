@@ -47,6 +47,7 @@ spec:
             requests:
               memory: 100Mi
               cpu: 0.5
+              ephemeral-storage: "2Gi" # Added storage request
             limits:
               memory: 100Mi
           env:
@@ -77,3 +78,37 @@ spec:
           startupProbe:
             tcpSocket:
               port: postgresql
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+  namespace: default-mem-example
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        memory: 100Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: storage-limit-range
+  namespace: namespace-with-limit-range
+spec:
+  limits:
+  - defaultRequest:
+      ephemeral-storage: "10Mi"
+    type: Container
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-request-range
+  namespace: default-cpu-example
+spec:
+  limits:
+  - defaultRequest:
+      cpu: 0.5
+    type: Container
