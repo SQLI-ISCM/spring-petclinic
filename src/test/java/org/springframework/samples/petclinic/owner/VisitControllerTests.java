@@ -50,6 +50,7 @@ class VisitControllerTests {
 	private static final int TEST_PET_ID = 1;
 
 	private static final String NEW_VISIT_URL = "/owners/{ownerId}/pets/{petId}/visits/new"; // Compliant
+	private static final String NEW_VISIT_URL_CONSTANT = "/owners/{ownerId}/pets/{petId}/visits/new"; // Constant for duplication
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -68,7 +69,7 @@ class VisitControllerTests {
 
 	@Test
 	void testInitNewVisitForm() throws Exception {
-		mockMvc.perform(get(NEW_VISIT_URL, TEST_OWNER_ID, TEST_PET_ID)) // Compliant
+		mockMvc.perform(get(NEW_VISIT_URL_CONSTANT, TEST_OWNER_ID, TEST_PET_ID)) // Compliant
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
 	}
@@ -76,7 +77,7 @@ class VisitControllerTests {
 	@Test
 	void testProcessNewVisitFormSuccess() throws Exception {
 		mockMvc
-			.perform(post(NEW_VISIT_URL, TEST_OWNER_ID, TEST_PET_ID) // Compliant
+			.perform(post(NEW_VISIT_URL_CONSTANT, TEST_OWNER_ID, TEST_PET_ID) // Compliant
 				.param("name", "George")
 				.param("description", "Visit Description"))
 			.andExpect(status().is3xxRedirection())
@@ -86,7 +87,7 @@ class VisitControllerTests {
 	@Test
 	void testProcessNewVisitFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post(NEW_VISIT_URL, TEST_OWNER_ID, TEST_PET_ID).param("name", // Compliant
+			.perform(post(NEW_VISIT_URL_CONSTANT, TEST_OWNER_ID, TEST_PET_ID).param("name", // Compliant
 					"George"))
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
