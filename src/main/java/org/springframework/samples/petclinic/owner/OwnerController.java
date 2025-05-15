@@ -52,6 +52,7 @@ class OwnerController {
 	private static final String MESSAGE_CREATION = "New Owner Created"; // Constant for creation success message
 	private static final String ERROR_UPDATE_MESSAGE = "There was an error in updating the owner."; // Constant for update error message
 	private static final String ERROR_ID_MISMATCH_MESSAGE = "Owner ID mismatch. Please try again."; // Constant for ID mismatch error message
+	private static final String ACTION_1 = "action1"; // Constant for action1
 
 	private final OwnerRepository owners;
 
