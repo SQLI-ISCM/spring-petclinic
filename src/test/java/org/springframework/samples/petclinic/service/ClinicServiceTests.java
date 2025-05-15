@@ -80,6 +80,9 @@ class ClinicServiceTests {
 
 	Pageable pageable;
 
+	private static final String SCHULTZ = "Schultz"; // Constant for duplicated string
+	private static final String CAT = "cat"; // Constant for pet type
+
 	@Test
 	void shouldFindOwnersByLastName() {
 		Page<Owner> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
@@ -97,25 +100,25 @@ class ClinicServiceTests {
 		assertThat(owner.getLastName()).startsWith("Franklin");
 		assertThat(owner.getPets()).hasSize(1);
 		assertThat(owner.getPets().get(0).getType()).isNotNull();
-		assertThat(owner.getPets().get(0).getType().getName()).isEqualTo("cat");
+		assertThat(owner.getPets().get(0).getType().getName()).isEqualTo(CAT); // Use constant
 	}
 
 	@Test
 	@Transactional
 	void shouldInsertOwner() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		Page<Owner> owners = this.owners.findByLastNameStartingWith(SCHULTZ, pageable); // Use constant
 		int found = (int) owners.getTotalElements();
 
 		Owner owner = new Owner();
 		owner.setFirstName("Sam");
-		owner.setLastName("Schultz");
+		owner.setLastName(SCHULTZ); // Use constant
 		owner.setAddress("4, Evans Street");
 		owner.setCity("Wollongong");
 		owner.setTelephone("4444444444");
 		this.owners.save(owner);
 		assertThat(owner.getId()).isNotZero();
 
-		owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		owners = this.owners.findByLastNameStartingWith(SCHULTZ, pageable); // Use constant
 		assertThat(owners.getTotalElements()).isEqualTo(found + 1);
 	}
 
@@ -143,7 +146,7 @@ class ClinicServiceTests {
 		Collection<PetType> petTypes = this.owners.findPetTypes();
 
 		PetType petType1 = EntityUtils.getById(petTypes, PetType.class, 1);
-		assertThat(petType1.getName()).isEqualTo("cat");
+		assertThat(petType1.getName()).isEqualTo(CAT); // Use constant
 		PetType petType4 = EntityUtils.getById(petTypes, PetType.class, 4);
 		assertThat(petType4.getName()).isEqualTo("snake");
 	}
