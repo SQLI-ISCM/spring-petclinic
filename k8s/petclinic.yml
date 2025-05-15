@@ -49,6 +49,7 @@ spec:
             requests:
               memory: 100Mi
               cpu: 0.5
+              ephemeral-storage: "2Gi" # Added storage request
             limits:
               memory: 100Mi
           livenessProbe:
