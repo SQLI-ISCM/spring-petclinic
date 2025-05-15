@@ -50,6 +50,7 @@ class VisitControllerTests {
 	private static final int TEST_PET_ID = 1;
 	
 	private static final String NEW_VISIT_URL = "/owners/{ownerId}/pets/{petId}/visits/new"; // Compliant
+	private static final String REDIRECT_OWNER_URL = "redirect:/owners/{ownerId}"; // New constant for redirect URL
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -80,7 +81,7 @@ class VisitControllerTests {
 				.param("name", "George")
 				.param("description", "Visit Description"))
 			.andExpect(status().is3xxRedirection())
-			.andExpect(view().name("redirect:/owners/{ownerId}"));
+			.andExpect(view().name(REDIRECT_OWNER_URL)); // Updated to use new constant
 	}
 
 	@Test
