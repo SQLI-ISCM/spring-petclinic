@@ -75,6 +75,10 @@ class OwnerControllerTests {
 	private static final String LAST_NAME_PARAM = "lastName"; // New constant for last name param
 	private static final String ADDRESS_PARAM = "address"; // New constant for address param
 	private static final String TELEPHONE_PARAM = "telephone"; // New constant for telephone param
+	private static final String OWNER_BLOGGS_LAST_NAME = "Bloggs"; // New constant for last name "Bloggs"
+	private static final String OWNER_LONDON_CITY = "London"; // New constant for city "London"
+	private static final String OWNER_CARAMEL_ADDRESS = "123 Caramel Street"; // New constant for address "123 Caramel Street"
+	private static final String OWNER_JOE_FIRST_NAME = "Joe"; // New constant for first name "Joe"
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -128,10 +132,10 @@ class OwnerControllerTests {
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
-			.perform(post(NEW_OWNER_URL).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
-				.param(ADDRESS_PARAM, "123 Caramel Street")
-				.param("city", "London")
+			.perform(post(NEW_OWNER_URL).param("firstName", OWNER_JOE_FIRST_NAME)
+				.param(LAST_NAME_PARAM, OWNER_BLOGGS_LAST_NAME)
+				.param(ADDRESS_PARAM, OWNER_CARAMEL_ADDRESS)
+				.param("city", OWNER_LONDON_CITY)
 				.param(TELEPHONE_PARAM, "1316761638"))
 			.andExpect(status().is3xxRedirection());
 	}
@@ -139,7 +143,7 @@ class OwnerControllerTests {
 	@Test
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post(NEW_OWNER_URL).param("firstName", "Joe").param(LAST_NAME_PARAM, "Bloggs").param("city", "London"))
+			.perform(post(NEW_OWNER_URL).param("firstName", OWNER_JOE_FIRST_NAME).param(LAST_NAME_PARAM, OWNER_BLOGGS_LAST_NAME).param("city", OWNER_LONDON_CITY))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", ADDRESS_PARAM))
@@ -199,10 +203,10 @@ class OwnerControllerTests {
 	@Test
 	void testProcessUpdateOwnerFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", OWNER_JOE_FIRST_NAME)
+				.param(LAST_NAME_PARAM, OWNER_BLOGGS_LAST_NAME)
 				.param(ADDRESS_PARAM, "123 Caramel Street")
-				.param("city", "London")
+				.param("city", OWNER_LONDON_CITY)
 				.param(TELEPHONE_PARAM, "1616291589"))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
@@ -218,8 +222,8 @@ class OwnerControllerTests {
 	@Test
 	void testProcessUpdateOwnerFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
-				.param(LAST_NAME_PARAM, "Bloggs")
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", OWNER_JOE_FIRST_NAME)
+				.param(LAST_NAME_PARAM, OWNER_BLOGGS_LAST_NAME)
 				.param(ADDRESS_PARAM, "")
 				.param(TELEPHONE_PARAM, ""))
 			.andExpect(status().isOk())
