@@ -71,3 +71,16 @@ spec:
           startupProbe:
             tcpSocket:
               port: postgresql
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "0.5"
+            limits:
+              memory: "100Mi"
+              cpu: "0.5"
+          volumeMounts:
+            - name: ephemeral
+              mountPath: "/tmp"
+      volumes:
+        - name: ephemeral
+          emptyDir: {}
