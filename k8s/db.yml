@@ -40,6 +40,7 @@ spec:
       labels:
         app: demo-db
     spec:
+      serviceAccountName: example-sa # Noncompliant
       containers:
         - image: postgres:17
           name: postgresql
@@ -71,3 +72,90 @@ spec:
           startupProbe:
             tcpSocket:
               port: postgresql
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 0.5
+            limits:
+              memory: 100Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+  namespace: default-mem-example
+spec:
+  limits:
+    - type: Container
+      default:
+        memory: 100Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-request-range
+  namespace: default-cpu-example
+spec:
+  limits:
+  - defaultRequest:
+      cpu: 0.5
+    type: Container
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: storage-limit-range
+  namespace: namespace-with-limit-range
+spec:
+  limits:
+  - defaultRequest:
+      ephemeral-storage: "10Mi"
+    type: Container
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+spec:
+  containers:
+    - name: web
+      image: nginx
+      resources:
+        requests:
+          ephemeral-storage: "2Gi"
+      volumeMounts:
+        - name: ephemeral
+          mountPath: "/tmp"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+  namespace: namespace-with-limit-range
+spec:
+  containers:
+    - name: web
+      image: nginx
+      volumeMounts:
+        - name: ephemeral
+          mountPath: "/tmp"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+  namespace: default-mem-example
+spec:
+  containers:
+    - name: web
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-ns-compliant
+  namespace: default-cpu-example
+spec:
+  containers:
+  - name: nginx-ns-compliant
+    image: nginx
