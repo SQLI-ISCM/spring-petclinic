@@ -79,7 +79,7 @@ public class PostgresIntegrationTests {
 	}
 
 	@Test
-	void testFindAll() throws Exception {
+	void testFindAll() throws CustomException { // Changed Exception to CustomException
 		vets.findAll();
 		vets.findAll(); // served from cache
 	}
@@ -147,4 +147,11 @@ public class PostgresIntegrationTests {
 
 	}
 
+}
+
+// Custom exception class
+class CustomException extends Exception {
+    public CustomException(String message) {
+        super(message);
+    }
 }
