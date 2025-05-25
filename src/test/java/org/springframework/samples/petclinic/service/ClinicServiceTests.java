@@ -80,6 +80,10 @@ class ClinicServiceTests {
 
 	Pageable pageable;
 
+	private static final String SCHULTZ = "Schultz"; // Constant for duplicated string
+	private static final String CAT = "cat"; // Constant for pet type
+	private static final String BOWSER = "bowser"; // Constant for pet name
+
 	@Test
 	void shouldFindOwnersByLastName() {
 		Page<Owner> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
@@ -97,25 +101,25 @@ class ClinicServiceTests {
 		assertThat(owner.getLastName()).startsWith("Franklin");
 		assertThat(owner.getPets()).hasSize(1);
 		assertThat(owner.getPets().get(0).getType()).isNotNull();
-		assertThat(owner.getPets().get(0).getType().getName()).isEqualTo("cat");
+		assertThat(owner.getPets().get(0).getType().getName()).isEqualTo(CAT);
 	}
 
 	@Test
 	@Transactional
 	void shouldInsertOwner() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		Page<Owner> owners = this.owners.findByLastNameStartingWith(SCHULTZ, pageable);
 		int found = (int) owners.getTotalElements();
 
 		Owner owner = new Owner();
 		owner.setFirstName("Sam");
-		owner.setLastName("Schultz");
+		owner.setLastName(SCHULTZ);
 		owner.setAddress("4, Evans Street");
 		owner.setCity("Wollongong");
 		owner.setTelephone("4444444444");
 		this.owners.save(owner);
 		assertThat(owner.getId()).isNotZero();
 
-		owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		owners = this.owners.findByLastNameStartingWith(SCHULTZ, pageable);
 		assertThat(owners.getTotalElements()).isEqualTo(found + 1);
 	}
 
@@ -143,7 +147,7 @@ class ClinicServiceTests {
 		Collection<PetType> petTypes = this.owners.findPetTypes();
 
 		PetType petType1 = EntityUtils.getById(petTypes, PetType.class, 1);
-		assertThat(petType1.getName()).isEqualTo("cat");
+		assertThat(petType1.getName()).isEqualTo(CAT);
 		PetType petType4 = EntityUtils.getById(petTypes, PetType.class, 4);
 		assertThat(petType4.getName()).isEqualTo("snake");
 	}
@@ -158,7 +162,7 @@ class ClinicServiceTests {
 		int found = owner6.getPets().size();
 
 		Pet pet = new Pet();
-		pet.setName("bowser");
+		pet.setName(BOWSER);
 		Collection<PetType> types = this.owners.findPetTypes();
 		pet.setType(EntityUtils.getById(types, PetType.class, 2));
 		pet.setBirthDate(LocalDate.now());
@@ -172,7 +176,7 @@ class ClinicServiceTests {
 		owner6 = optionalOwner.get();
 		assertThat(owner6.getPets()).hasSize(found + 1);
 		// checks that id has been generated
-		pet = owner6.getPet("bowser");
+		pet = owner6.getPet(BOWSER);
 		assertThat(pet.getId()).isNotNull();
 	}
 
