@@ -79,9 +79,13 @@ public class PostgresIntegrationTests {
 	}
 
 	@Test
-	void testFindAll() throws Exception {
-		vets.findAll();
-		vets.findAll(); // served from cache
+	void testFindAll() {
+		try {
+			vets.findAll();
+			vets.findAll(); // served from cache
+		} catch (Exception e) {
+			throw new RuntimeException("An error occurred while finding all vets", e);
+		}
 	}
 
 	@Test
