@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org"
+<html xmlns:th="https://www.thymeleaf.org" lang="en" xml:lang="en"
       th:replace="~{fragments/layout :: layout (~{::body},'vets')}">
+
+<head>
+  <title th:text="#{vets}">Veterinarians</title>
+</head>
 
 <body>
 
