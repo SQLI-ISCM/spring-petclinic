@@ -1,4 +1,6 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Page Title</title></head>
 <body>
   <form>
     <th:block th:fragment="input (label, name, type)">
@@ -8,8 +10,8 @@
         <label th:for="${name}" class="col-sm-2 control-label" th:text="${label}">Label</label>
         <div class="col-sm-10">
             <div th:switch="${type}">
-                <input th:case="'text'" class="form-control" type="text" th:field="*{__${name}__}" />
-                <input th:case="'date'" class="form-control" type="date" th:field="*{__${name}__}"/>
+                <input th:case="'text'" class="form-control" type="text" id="${name}" th:field="*{__${name}__}" />
+                <input th:case="'date'" class="form-control" type="date" id="${name}" th:field="*{__${name}__}"/>
             </div>
           <span th:if="${valid}"
             class="fa fa-ok form-control-feedback"
