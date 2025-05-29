@@ -145,6 +145,12 @@ public class PostgresIntegrationTests {
 			return sources;
 		}
 
+		public void checkValue(int value) {
+			if (value == 42) {
+				throw new IllegalArgumentException("Value is 42"); // Compliant
+			}
+		}
+
 	}
 
 }
