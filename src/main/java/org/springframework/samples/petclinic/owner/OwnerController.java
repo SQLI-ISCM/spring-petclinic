@@ -47,6 +47,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 class OwnerController {
 
 	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+	private static final String ERROR_MESSAGE = "error"; // Compliant
+	private static final String ERROR_CREATING_OWNER = "There was an error in creating the owner."; // Compliant
+	private static final String MESSAGE_NEW_OWNER_CREATED = "New Owner Created"; // Compliant
+	private static final String ERROR_UPDATING_OWNER = "There was an error in updating the owner."; // Compliant
+	private static final String ERROR_OWNER_ID_MISMATCH = "Owner ID mismatch. Please try again."; // Compliant
 
 	private final OwnerRepository owners;
 
@@ -75,12 +80,12 @@ class OwnerController {
 	@PostMapping("/owners/new")
 	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner.");
+			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_CREATING_OWNER);
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 		}
 
 		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "New Owner Created");
+		redirectAttributes.addFlashAttribute(ERROR_MESSAGE, MESSAGE_NEW_OWNER_CREATED);
 		return "redirect:/owners/" + owner.getId();
 	}
 
@@ -139,13 +144,13 @@ class OwnerController {
 	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
+			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_UPDATING_OWNER);
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 		}
 
 		if (owner.getId() != ownerId) {
 			result.rejectValue("id", "mismatch", "The owner ID in the form does not match the URL.");
-			redirectAttributes.addFlashAttribute("error", "Owner ID mismatch. Please try again.");
+			redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ERROR_OWNER_ID_MISMATCH);
 			return "redirect:/owners/{ownerId}/edit";
 		}
 
