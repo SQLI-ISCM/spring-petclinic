@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: workload
-          image: dsyer/petclinic
+          image: dsyer/petclinic:1.0.0 # Compliant, fixed tag
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
@@ -44,6 +44,12 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          resources:
+            requests:
+              memory: 100Mi # Compliant, memory request
+              cpu: 0.5 # Compliant, CPU request
+            limits:
+              memory: 100Mi # Compliant, memory limit
           livenessProbe:
             httpGet:
               path: /livez
@@ -62,3 +68,4 @@ spec:
             sources:
               - secret:
                   name: demo-db
+          automountServiceAccountToken: false # Compliant, disable automount
