@@ -79,7 +79,7 @@ public class PostgresIntegrationTests {
 	}
 
 	@Test
-	void testFindAll() throws Exception {
+	void testFindAll() {
 		vets.findAll();
 		vets.findAll(); // served from cache
 	}
@@ -136,15 +136,4 @@ public class PostgresIntegrationTests {
 		}
 
 		private List<EnumerablePropertySource<?>> findPropertiesPropertySources() {
-			List<EnumerablePropertySource<?>> sources = new LinkedList<>();
-			for (PropertySource<?> source : environment.getPropertySources()) {
-				if (source instanceof EnumerablePropertySource enumerable) {
-					sources.add(enumerable);
-				}
-			}
-			return sources;
-		}
-
-	}
-
-}
+			List<Enumerable
