@@ -115,11 +115,8 @@ public class Owner extends Person {
 	 */
 	public Pet getPet(Integer id) {
 		for (Pet pet : getPets()) {
-			if (!pet.isNew()) {
-				Integer compId = pet.getId();
-				if (compId.equals(id)) {
-					return pet;
-				}
+			if (!pet.isNew() && pet.getId().equals(id)) {
+				return pet;
 			}
 		}
 		return null;
@@ -157,19 +154,3 @@ public class Owner extends Person {
 
 	/**
 	 * Adds the given {@link Visit} to the {@link Pet} with the given identifier.
-	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
-	 * @param visit the visit to add, must not be {@literal null}.
-	 */
-	public void addVisit(Integer petId, Visit visit) {
-
-		Assert.notNull(petId, "Pet identifier must not be null!");
-		Assert.notNull(visit, "Visit must not be null!");
-
-		Pet pet = getPet(petId);
-
-		Assert.notNull(pet, "Invalid Pet identifier!");
-
-		pet.addVisit(visit);
-	}
-
-}
