@@ -10,12 +10,17 @@
         th:class="${'form-group' + (valid ? '' : ' has-error')}"
         class="form-group">
         <div class="col-sm-2 control-label">
-          <label th:for="${name}" class="control-label" th:text="${label}">Label</label>
+          <label class="control-label">
+            <span th:text="${label}">Label</span>
+            <th:block th:switch="${type}">
+              <input th:case="'text'" class="form-control" type="text" th:field="*{__${name}__}" id="__${name}__" />
+              <input th:case="'date'" class="form-control" type="date" th:field="*{__${name}__}" id="__${name}__"/>
+            </th:block>
+          </label>
         </div>
         <div class="col-sm-10">
             <div th:switch="${type}">
-                <input th:case="'text'" class="form-control" type="text" th:field="*{__${name}__}" id="__${name}__" />
-                <input th:case="'date'" class="form-control" type="date" th:field="*{__${name}__}" id="__${name}__"/>
+                <!-- Moved input fields inside the label as per compliance, so remove these duplicated inputs here -->
             </div>
           <span th:if="${valid}"
             class="fa fa-ok form-control-feedback"
