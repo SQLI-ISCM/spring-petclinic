@@ -30,7 +30,7 @@ import java.util.Collection;
  * @see org.springframework.samples.petclinic.model.BaseEntity
  * @since 29.10.2003
  */
-public abstract class EntityUtils {
+public class EntityUtils {
 
 	private EntityUtils() {
 		throw new IllegalStateException("Utility class");
