@@ -62,6 +62,12 @@ spec:
           ports:
             - containerPort: 5432
               name: postgresql
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 0.5
+              memory: 100Mi
           livenessProbe:
             tcpSocket:
               port: postgresql
