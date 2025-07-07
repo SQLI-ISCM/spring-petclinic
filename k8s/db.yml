@@ -62,6 +62,13 @@ spec:
           ports:
             - containerPort: 5432
               name: postgresql
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 0.5
+              memory: 100Mi
+              ephemeral-storage: "2Gi"
           livenessProbe:
             tcpSocket:
               port: postgresql
@@ -71,3 +78,4 @@ spec:
           startupProbe:
             tcpSocket:
               port: postgresql
+      automountServiceAccountToken: false
